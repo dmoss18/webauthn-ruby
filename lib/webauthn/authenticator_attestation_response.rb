@@ -74,7 +74,7 @@ module WebAuthn
     end
 
     def valid_attestation_statement?
-      @attestation_type, @attestation_trust_path = attestation_object.valid_attestation_statement?(client_data.hash, client_data.extra_options)
+      @attestation_type, @attestation_trust_path = attestation_object.valid_attestation_statement?(client_data.hash)
     end
   end
 end

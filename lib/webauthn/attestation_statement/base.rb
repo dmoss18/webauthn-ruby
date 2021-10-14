@@ -32,7 +32,7 @@ module WebAuthn
         @statement = statement
       end
 
-      def valid?(_authenticator_data, _client_data_hash)
+      def valid?(_authenticator_data, _client_data_hash, _options = {})
         raise NotImplementedError
       end
 

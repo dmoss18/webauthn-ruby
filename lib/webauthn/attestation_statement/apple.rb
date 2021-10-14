@@ -27,7 +27,7 @@ module WebAuthn
 
       NONCE_EXTENSION_OID = "1.2.840.113635.100.8.2"
 
-      def valid?(authenticator_data, client_data_hash)
+      def valid?(authenticator_data, client_data_hash, _options = {})
         valid_nonce?(authenticator_data, client_data_hash) &&
           matching_public_key?(authenticator_data) &&
           trustworthy? &&

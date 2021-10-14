@@ -7,7 +7,7 @@ require "webauthn/attestation_statement/base"
 module WebAuthn
   module AttestationStatement
     class AndroidKey < Base
-      def valid?(authenticator_data, client_data_hash)
+      def valid?(authenticator_data, client_data_hash, _options = {})
         valid_signature?(authenticator_data, client_data_hash) &&
           matching_public_key?(authenticator_data) &&
           valid_attestation_challenge?(client_data_hash) &&

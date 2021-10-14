@@ -18,10 +18,10 @@ module WebAuthn
       encoder = WebAuthn.configuration.encoder
 
       new(
-        encoder.decode(response[:attestationObject]),
-        response[:appId],
-        response[:challenge],
-        response[:keyId]
+        encoder.decode(response['attestationObject']),
+        response['appId'],
+        response['challenge'],
+        response['keyId']
       )
     end
 
@@ -51,7 +51,7 @@ module WebAuthn
 
     # List of app ids, if you have multiple apps
     def acceptable_app_ids
-      @acceptable_app_ids ||= (ENV['IOS_ATTESTATION_APP_IDS']&.split(',') || [])
+      @acceptable_app_ids ||= ENV.fetch('IOS_ATTESTATION_APP_IDS', '')&.split(',')
     end
 
     def valid_app_id?(app_id)

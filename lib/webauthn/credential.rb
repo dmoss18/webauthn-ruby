@@ -26,16 +26,16 @@ module WebAuthn
 
     def self.from_ios_attest(attestation_string:, key_id:, app_id:, challenge:)
       data = {
-        type: WebAuthn::TYPE_PUBLIC_KEY,
-        id: key_id,
-        rawId: key_id,
-        response: {
-          attestationObject: attestation_string,
-          appId: app_id,
-          keyId: key_id,
-          challenge: challenge
+        'type' => WebAuthn::TYPE_PUBLIC_KEY,
+        'id' => key_id,
+        'rawId' => key_id,
+        'response' => {
+          'attestationObject' => attestation_string,
+          'appId' => app_id,
+          'keyId' => key_id,
+          'challenge' => challenge
         }
-      }.with_indifferent_access
+      }
       WebAuthn::PublicKeyCredentialWithAttestation.from_client(data, WebAuthn::IOSAttestationResponse)
     end
   end

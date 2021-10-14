@@ -17,7 +17,7 @@ module WebAuthn
         "ES256" => { signature: ::TPM::ALG_ECDSA, hash: ::TPM::ALG_SHA256 },
       }.freeze
 
-      def valid?(authenticator_data, client_data_hash)
+      def valid?(authenticator_data, client_data_hash, _options = {})
         attestation_type == ATTESTATION_TYPE_ATTCA &&
           ver == TPM_V2 &&
           valid_key_attestation?(

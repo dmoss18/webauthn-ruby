@@ -8,7 +8,7 @@ module WebAuthn
   module AttestationStatement
     # Implements https://www.w3.org/TR/webauthn-1/#sctn-android-safetynet-attestation
     class AndroidSafetynet < Base
-      def valid?(authenticator_data, client_data_hash)
+      def valid?(authenticator_data, client_data_hash, _options = {})
         valid_response?(authenticator_data, client_data_hash) &&
           valid_version? &&
           cts_profile_match? &&

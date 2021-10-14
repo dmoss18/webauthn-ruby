@@ -8,7 +8,7 @@ module WebAuthn
   module AttestationStatement
     class Packed < Base
       # Follows "Verification procedure"
-      def valid?(authenticator_data, client_data_hash)
+      def valid?(authenticator_data, client_data_hash, _options = {})
         valid_format? &&
           valid_algorithm?(authenticator_data.credential) &&
           valid_ec_public_keys?(authenticator_data.credential) &&
