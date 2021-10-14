@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
-require "cose"
-require "openssl"
-require "webauthn/attestation_statement/base"
-require "webauthn/attestation_statement/fido_u2f/public_key"
+require 'cose'
+require 'openssl'
+require 'webauthn/attestation_statement/base'
+require 'webauthn/attestation_statement/fido_u2f/public_key'
 
 module WebAuthn
   module AttestationStatement
     class FidoU2f < Base
       VALID_ATTESTATION_CERTIFICATE_COUNT = 1
-      VALID_ATTESTATION_CERTIFICATE_ALGORITHM = COSE::Algorithm.by_name("ES256")
-      VALID_ATTESTATION_CERTIFICATE_KEY_CURVE = COSE::Key::Curve.by_name("P-256")
+      VALID_ATTESTATION_CERTIFICATE_ALGORITHM = COSE::Algorithm.by_name('ES256')
+      VALID_ATTESTATION_CERTIFICATE_KEY_CURVE = COSE::Key::Curve.by_name('P-256')
 
       def valid?(authenticator_data, client_data_hash, _options = {})
         valid_format? &&
@@ -24,10 +24,12 @@ module WebAuthn
 
       private
 
+      # rubocop:disable Style/DoubleNegation
       def valid_format?
         !!(raw_certificates && signature) &&
           raw_certificates.length == VALID_ATTESTATION_CERTIFICATE_COUNT
       end
+      # rubocop:enable Style/DoubleNegation
 
       def valid_certificate_public_key?
         certificate_public_key.is_a?(OpenSSL::PKey::EC) &&

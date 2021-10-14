@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "webauthn/public_key_credential/entity"
+require 'webauthn/public_key_credential/entity'
 
 module WebAuthn
   class PublicKeyCredential

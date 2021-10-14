@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "android_key_attestation"
-require "openssl"
-require "webauthn/attestation_statement/base"
+require 'android_key_attestation'
+require 'openssl'
+require 'webauthn/attestation_statement/base'
 
 module WebAuthn
   module AttestationStatement

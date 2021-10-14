@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require "cose/algorithm"
-require "webauthn/public_key_credential/options"
-require "webauthn/public_key_credential/rp_entity"
-require "webauthn/public_key_credential/user_entity"
+require 'cose/algorithm'
+require 'webauthn/public_key_credential/options'
+require 'webauthn/public_key_credential/rp_entity'
+require 'webauthn/public_key_credential/user_entity'
 
 module WebAuthn
   class PublicKeyCredential
@@ -17,6 +17,7 @@ module WebAuthn
         :user
       )
 
+      # rubocop:disable Naming/MethodParameterName
       def initialize(
         attestation: nil,
         authenticator_selection: nil,
@@ -54,6 +55,7 @@ module WebAuthn
             user
           end
       end
+      # rubocop:enable Naming/MethodParameterName
 
       def exclude_credentials
         @exclude_credentials || exclude_credentials_from_exclude
@@ -70,9 +72,7 @@ module WebAuthn
       end
 
       def exclude_credentials_from_exclude
-        if exclude
-          as_public_key_descriptors(exclude)
-        end
+        as_public_key_descriptors(exclude) if exclude
       end
 
       def pub_key_cred_params_from_algs

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require "cbor"
-require "forwardable"
-require "openssl"
-require "webauthn/attestation_statement"
-require "webauthn/authenticator_data"
+require 'cbor'
+require 'forwardable'
+require 'openssl'
+require 'webauthn/attestation_statement'
+require 'webauthn/authenticator_data'
 
 module WebAuthn
   class AttestationObject
@@ -16,8 +16,8 @@ module WebAuthn
 
     def self.from_map(map)
       new(
-        authenticator_data: WebAuthn::AuthenticatorData.deserialize(map["authData"]),
-        attestation_statement: WebAuthn::AttestationStatement.from(map["fmt"], map["attStmt"])
+        authenticator_data: WebAuthn::AuthenticatorData.deserialize(map['authData']),
+        attestation_statement: WebAuthn::AttestationStatement.from(map['fmt'], map['attStmt'])
       )
     end
 

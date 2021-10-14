@@ -1,20 +1,20 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+require 'spec_helper'
 
-require "webauthn/configuration"
-require "webauthn/credential"
+require 'webauthn/configuration'
+require 'webauthn/credential'
 
-RSpec.describe "Credential" do
+RSpec.describe 'Credential' do
   let(:origin) { fake_origin }
 
   before do
     WebAuthn.configuration.origin = origin
   end
 
-  describe ".from_create" do
+  describe '.from_create' do
     let(:challenge) do
-      WebAuthn::Credential.options_for_create(user: { id: "1", name: "User" }).challenge
+      WebAuthn::Credential.options_for_create(user: { id: '1', name: 'User' }).challenge
     end
 
     let(:client) { WebAuthn::FakeClient.new(origin) }
@@ -23,10 +23,10 @@ RSpec.describe "Credential" do
       WebAuthn.configuration.encoding = encoding
     end
 
-    context "when encoding is base64url" do
+    context 'when encoding is base64url' do
       let(:encoding) { :base64url }
 
-      it "works" do
+      it 'works' do
         credential = WebAuthn::Credential.from_create(client.create(challenge: challenge))
 
         expect(credential.verify(challenge)).to be_truthy
@@ -39,10 +39,10 @@ RSpec.describe "Credential" do
       end
     end
 
-    context "when encoding is base64" do
+    context 'when encoding is base64' do
       let(:encoding) { :base64 }
 
-      it "works" do
+      it 'works' do
         credential = WebAuthn::Credential.from_create(client.create(challenge: challenge))
 
         expect(credential.verify(challenge)).to be_truthy
@@ -55,10 +55,10 @@ RSpec.describe "Credential" do
       end
     end
 
-    context "when not encoding" do
+    context 'when not encoding' do
       let(:encoding) { false }
 
-      it "works" do
+      it 'works' do
         credential = WebAuthn::Credential.from_create(client.create(challenge: challenge))
 
         expect(credential.verify(challenge)).to be_truthy
@@ -72,7 +72,7 @@ RSpec.describe "Credential" do
     end
   end
 
-  describe ".from_get" do
+  describe '.from_get' do
     let(:challenge) do
       WebAuthn::Credential.options_for_get.challenge
     end
@@ -95,10 +95,10 @@ RSpec.describe "Credential" do
       created_credential
     end
 
-    context "when encoding is base64url" do
+    context 'when encoding is base64url' do
       let(:encoding) { :base64url }
 
-      it "works" do
+      it 'works' do
         credential = WebAuthn::Credential.from_get(client.get(challenge: challenge))
 
         expect(credential.verify(challenge, public_key: public_key, sign_count: sign_count)).to be_truthy
@@ -109,10 +109,10 @@ RSpec.describe "Credential" do
       end
     end
 
-    context "when encoding is base64" do
+    context 'when encoding is base64' do
       let(:encoding) { :base64 }
 
-      it "works" do
+      it 'works' do
         credential = WebAuthn::Credential.from_get(client.get(challenge: challenge))
 
         expect(credential.verify(challenge, public_key: public_key, sign_count: sign_count)).to be_truthy
@@ -123,10 +123,10 @@ RSpec.describe "Credential" do
       end
     end
 
-    context "when not encoding" do
+    context 'when not encoding' do
       let(:encoding) { false }
 
-      it "works" do
+      it 'works' do
         credential = WebAuthn::Credential.from_get(client.get(challenge: challenge))
 
         expect(credential.verify(challenge, public_key: public_key, sign_count: sign_count)).to be_truthy

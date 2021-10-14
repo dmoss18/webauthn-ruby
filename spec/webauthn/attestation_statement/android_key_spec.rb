@@ -1,20 +1,20 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+require 'spec_helper'
 
-require "json"
-require "openssl"
-require "webauthn/attestation_statement/android_key"
+require 'json'
+require 'openssl'
+require 'webauthn/attestation_statement/android_key'
 
-RSpec.describe "AndroidKey attestation" do
-  describe "#valid?" do
+RSpec.describe 'AndroidKey attestation' do
+  describe '#valid?' do
     let(:credential_key) { create_ec_key }
     let(:client_data_hash) { OpenSSL::Digest::SHA256.digest({}.to_json) }
 
     let(:authenticator_data_bytes) do
       WebAuthn::FakeAuthenticator::AuthenticatorData.new(
-        rp_id_hash: OpenSSL::Digest.digest("SHA256", "RP"),
-        credential: { id: "0".b * 16, public_key: credential_key.public_key },
+        rp_id_hash: OpenSSL::Digest.digest('SHA256', 'RP'),
+        credential: { id: '0'.b * 16, public_key: credential_key.public_key }
       ).serialize
     end
 
@@ -23,7 +23,7 @@ RSpec.describe "AndroidKey attestation" do
 
     let(:algorithm) { -7 }
     let(:attestation_key) { credential_key }
-    let(:signature) { attestation_key.sign("SHA256", to_be_signed) }
+    let(:signature) { attestation_key.sign('SHA256', to_be_signed) }
     let(:attestation_certificate_attestation_challenge) { OpenSSL::ASN1::OctetString.new(client_data_hash) }
     let(:attestation_certificate_purpose) { OpenSSL::ASN1::Set.new([OpenSSL::ASN1::Integer.new(2)], 1, :EXPLICIT) }
     let(:attestation_certificate_origin) { OpenSSL::ASN1::Integer.new(0, 702, :EXPLICIT) }
@@ -42,7 +42,7 @@ RSpec.describe "AndroidKey attestation" do
           OpenSSL::ASN1::Integer.new(0),
           OpenSSL::ASN1::Integer.new(0),
           attestation_certificate_attestation_challenge,
-          OpenSSL::ASN1::OctetString.new(""),
+          OpenSSL::ASN1::OctetString.new(''),
           attestation_certificate_software_enforced,
           attestation_certificate_tee_enforced
         ]
@@ -50,7 +50,7 @@ RSpec.describe "AndroidKey attestation" do
     end
 
     let(:attestation_certificate_extensions) do
-      [OpenSSL::X509::Extension.new("1.3.6.1.4.1.11129.2.1.17", attestation_certificate_extension, false)]
+      [OpenSSL::X509::Extension.new('1.3.6.1.4.1.11129.2.1.17', attestation_certificate_extension, false)]
     end
 
     let(:attestation_certificate) do
@@ -64,9 +64,9 @@ RSpec.describe "AndroidKey attestation" do
 
     let(:statement) do
       WebAuthn::AttestationStatement::AndroidKey.new(
-        "alg" => algorithm,
-        "sig" => signature,
-        "x5c" => [attestation_certificate]
+        'alg' => algorithm,
+        'sig' => signature,
+        'x5c' => [attestation_certificate]
       )
     end
 
@@ -87,46 +87,46 @@ RSpec.describe "AndroidKey attestation" do
       expect(statement.valid?(authenticator_data, client_data_hash)).to be_truthy
     end
 
-    context "when RSA algorithm" do
+    context 'when RSA algorithm' do
       let(:algorithm) { -257 }
       let(:credential_key) { create_rsa_key }
 
-      it "works" do
+      it 'works' do
         expect(statement.valid?(authenticator_data, client_data_hash)).to be_truthy
       end
     end
 
-    context "when signature is invalid" do
-      context "because is signed with a different alg" do
+    context 'when signature is invalid' do
+      context 'because is signed with a different alg' do
         let(:algorithm) { -36 }
 
-        it "fails" do
-          expect {
+        it 'fails' do
+          expect do
             statement.valid?(authenticator_data, client_data_hash)
-          }.to raise_error("Unsupported algorithm -36")
+          end.to raise_error('Unsupported algorithm -36')
         end
       end
 
-      context "because it was signed with a different key" do
-        let(:signature) { create_ec_key.sign("SHA256", to_be_signed) }
+      context 'because it was signed with a different key' do
+        let(:signature) { create_ec_key.sign('SHA256', to_be_signed) }
 
-        it "fails" do
+        it 'fails' do
           expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
         end
       end
 
-      context "because it was signed over different data" do
-        let(:to_be_signed) { "other data" }
+      context 'because it was signed over different data' do
+        let(:to_be_signed) { 'other data' }
 
-        it "fails" do
+        it 'fails' do
           expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
         end
       end
 
-      context "because it is corrupted" do
-        let(:signature) { "corrupted signature".b }
+      context 'because it is corrupted' do
+        let(:signature) { 'corrupted signature'.b }
 
-        it "fails" do
+        it 'fails' do
           expect { statement.valid?(authenticator_data, client_data_hash) }.to raise_error(OpenSSL::PKey::PKeyError)
         end
       end
@@ -135,21 +135,21 @@ RSpec.describe "AndroidKey attestation" do
     context "when the attestation key doesn't match the credential key" do
       let(:attestation_key) { create_ec_key }
 
-      it "fails" do
+      it 'fails' do
         expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
       end
     end
 
     context "when the attestation certificate doesn't meet requirements" do
-      context "because attestationChallenge is invalid" do
+      context 'because attestationChallenge is invalid' do
         let(:attestation_certificate_attestation_challenge) { OpenSSL::ASN1::OctetString.new(client_data_hash[0..-2]) }
 
-        it "fails" do
+        it 'fails' do
           expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
         end
       end
 
-      context "because allApplications field is present teeEnforced" do
+      context 'because allApplications field is present teeEnforced' do
         let(:attestation_certificate_tee_enforced) do
           OpenSSL::ASN1::Sequence.new(
             [
@@ -160,46 +160,46 @@ RSpec.describe "AndroidKey attestation" do
           )
         end
 
-        it "fails" do
+        it 'fails' do
           expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
         end
       end
 
-      context "because allApplications field is present softwareEnforced" do
+      context 'because allApplications field is present softwareEnforced' do
         let(:attestation_certificate_software_enforced) do
           OpenSSL::ASN1::Sequence.new([OpenSSL::ASN1::Null.new(nil, 600, :EXPLICIT)])
         end
 
-        it "fails" do
+        it 'fails' do
           expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
         end
       end
 
-      context "because AuthorizationList.purpose is invalid" do
+      context 'because AuthorizationList.purpose is invalid' do
         let(:attestation_certificate_purpose) { OpenSSL::ASN1::Set.new([OpenSSL::ASN1::Integer.new(3)], 1, :EXPLICIT) }
 
-        it "fails" do
+        it 'fails' do
           expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
         end
       end
 
-      context "because AuthorizationList.origin is invalid" do
+      context 'because AuthorizationList.origin is invalid' do
         let(:attestation_certificate_origin) { OpenSSL::ASN1::Integer.new(1, 702, :EXPLICIT) }
 
-        it "fails" do
+        it 'fails' do
           expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
         end
       end
     end
 
-    context "when the attestation certificate is not signed by Google" do
+    context 'when the attestation certificate is not signed by Google' do
       let(:google_certificates) { [create_root_certificate(create_ec_key)] }
 
-      it "fails" do
+      it 'fails' do
         expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
       end
 
-      it "returns true if they are configured" do
+      it 'returns true if they are configured' do
         WebAuthn.configuration.attestation_root_certificates_finders = finder_for(root_certificate)
 
         expect(statement.valid?(authenticator_data, client_data_hash)).to be_truthy

@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-require "openssl"
-require "securerandom"
-require "webauthn/authenticator_data"
-require "webauthn/encoder"
-require "webauthn/fake_authenticator"
+require 'openssl'
+require 'securerandom'
+require 'webauthn/authenticator_data'
+require 'webauthn/encoder'
+require 'webauthn/fake_authenticator'
 
 module WebAuthn
   class FakeClient
-    TYPES = { create: "webauthn.create", get: "webauthn.get" }.freeze
+    TYPES = { create: 'webauthn.create', get: 'webauthn.get' }.freeze
 
     attr_reader :origin, :token_binding
 
@@ -49,21 +49,21 @@ module WebAuthn
       id =
         if attested_credential_data
           WebAuthn::AuthenticatorData
-            .deserialize(CBOR.decode(attestation_object)["authData"])
+            .deserialize(CBOR.decode(attestation_object)['authData'])
             .attested_credential_data
             .id
         else
-          "id-for-pk-without-attested-credential-data"
+          'id-for-pk-without-attested-credential-data'
         end
 
       {
-        "type" => "public-key",
-        "id" => internal_encoder.encode(id),
-        "rawId" => encoder.encode(id),
-        "clientExtensionResults" => extensions,
-        "response" => {
-          "attestationObject" => encoder.encode(attestation_object),
-          "clientDataJSON" => encoder.encode(client_data_json)
+        'type' => 'public-key',
+        'id' => internal_encoder.encode(id),
+        'rawId' => encoder.encode(id),
+        'clientExtensionResults' => extensions,
+        'response' => {
+          'attestationObject' => encoder.encode(attestation_object),
+          'clientDataJSON' => encoder.encode(client_data_json)
         }
       }
     end
@@ -81,9 +81,7 @@ module WebAuthn
       client_data_json = data_json_for(:get, encoder.decode(challenge))
       client_data_hash = hashed(client_data_json)
 
-      if allow_credentials
-        allow_credentials = allow_credentials.map { |credential| encoder.decode(credential) }
-      end
+      allow_credentials = allow_credentials.map { |credential| encoder.decode(credential) } if allow_credentials
 
       assertion = authenticator.get_assertion(
         rp_id: rp_id,
@@ -96,15 +94,15 @@ module WebAuthn
       )
 
       {
-        "type" => "public-key",
-        "id" => internal_encoder.encode(assertion[:credential_id]),
-        "rawId" => encoder.encode(assertion[:credential_id]),
-        "clientExtensionResults" => extensions,
-        "response" => {
-          "clientDataJSON" => encoder.encode(client_data_json),
-          "authenticatorData" => encoder.encode(assertion[:authenticator_data]),
-          "signature" => encoder.encode(assertion[:signature]),
-          "userHandle" => user_handle ? encoder.encode(user_handle) : nil
+        'type' => 'public-key',
+        'id' => internal_encoder.encode(assertion[:credential_id]),
+        'rawId' => encoder.encode(assertion[:credential_id]),
+        'clientExtensionResults' => extensions,
+        'response' => {
+          'clientDataJSON' => encoder.encode(client_data_json),
+          'authenticatorData' => encoder.encode(assertion[:authenticator_data]),
+          'signature' => encoder.encode(assertion[:signature]),
+          'userHandle' => user_handle ? encoder.encode(user_handle) : nil
         }
       }
     end
@@ -120,9 +118,7 @@ module WebAuthn
         origin: origin
       }
 
-      if token_binding
-        data[:tokenBinding] = token_binding
-      end
+      data[:tokenBinding] = token_binding if token_binding
 
       data.to_json
     end

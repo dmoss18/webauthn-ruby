@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require "cose/algorithm"
-require "cose/error"
-require "cose/key"
-require "cose/rsapkcs1_algorithm"
-require "webauthn/attestation_statement/fido_u2f/public_key"
+require 'cose/algorithm'
+require 'cose/error'
+require 'cose/key'
+require 'cose/rsapkcs1_algorithm'
+require 'webauthn/attestation_statement/fido_u2f/public_key'
 
 module WebAuthn
   class PublicKey
@@ -24,7 +24,7 @@ module WebAuthn
           # user and later be passed as the public_key argument in the
           # AuthenticatorAssertionResponse.verify call, we then need to support the two formats.
           COSE::Key::EC2.new(
-            alg: COSE::Algorithm.by_name("ES256").id,
+            alg: COSE::Algorithm.by_name('ES256').id,
             crv: 1,
             x: public_key[1..32],
             y: public_key[33..-1]

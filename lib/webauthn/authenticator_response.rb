@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require "webauthn/authenticator_data"
-require "webauthn/client_data"
-require "webauthn/error"
-require "webauthn/security_utils"
+require 'webauthn/authenticator_data'
+require 'webauthn/client_data'
+require 'webauthn/error'
+require 'webauthn/security_utils'
 
 module WebAuthn
-  TYPES = { create: "webauthn.create", get: "webauthn.get" }.freeze
+  TYPES = { create: 'webauthn.create', get: 'webauthn.get' }.freeze
 
   class VerificationError < Error; end
 
@@ -25,7 +25,7 @@ module WebAuthn
     end
 
     def verify(expected_challenge, expected_origin = nil, user_verification: nil, rp_id: nil)
-      expected_origin ||= WebAuthn.configuration.origin || raise("Unspecified expected origin")
+      expected_origin ||= WebAuthn.configuration.origin || raise('Unspecified expected origin')
       rp_id ||= WebAuthn.configuration.rp_id
 
       verify_item(:type)
@@ -35,13 +35,9 @@ module WebAuthn
       verify_item(:authenticator_data)
       verify_item(:rp_id, rp_id || rp_id_from_origin(expected_origin))
 
-      if !WebAuthn.configuration.silent_authentication
-        verify_item(:user_presence)
-      end
+      verify_item(:user_presence) unless WebAuthn.configuration.silent_authentication
 
-      if user_verification
-        verify_item(:user_verified)
-      end
+      verify_item(:user_verified) if user_verification
 
       true
     end
@@ -64,7 +60,7 @@ module WebAuthn
       if send("valid_#{item}?", *args)
         true
       else
-        camelized_item = item.to_s.split('_').map { |w| w.capitalize }.join
+        camelized_item = item.to_s.split('_').map(&:capitalize).join
         error_const_name = "WebAuthn::#{camelized_item}VerificationError"
         raise Object.const_get(error_const_name)
       end
@@ -110,7 +106,7 @@ module WebAuthn
     end
 
     def type
-      raise NotImplementedError, "Please define #type method in subclass"
+      raise NotImplementedError, 'Please define #type method in subclass'
     end
   end
 end

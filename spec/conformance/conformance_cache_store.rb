@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
-require "fido_metadata"
-require "fido_metadata/test_cache_store"
-require "zip"
+require 'fido_metadata'
+require 'fido_metadata/test_cache_store'
+require 'zip'
 
 class ConformanceCacheStore < FidoMetadata::TestCacheStore
-  FILENAME = "metadata.zip"
+  FILENAME = 'metadata.zip'
 
   def setup_authenticators
     puts("#{FILENAME} not found, this will affect Metadata Service Test results.") unless File.exist?(FILENAME)
 
-    Zip::File.open(FILENAME).glob("metadataStatements/*.json") do |file|
+    Zip::File.open(FILENAME).glob('metadataStatements/*.json') do |file|
       json = JSON.parse(file.get_input_stream.read)
       statement = FidoMetadata::Statement.from_json(json)
       identifier = statement.aaguid || statement.attestation_certificate_key_identifiers.first
@@ -19,16 +19,16 @@ class ConformanceCacheStore < FidoMetadata::TestCacheStore
   end
 
   def setup_metadata_store
-    puts("Setting up metadata store TOC")
+    puts('Setting up metadata store TOC')
 
     response = Net::HTTP.post(
-      URI("https://mds.certinfra.fidoalliance.org/getEndpoints"),
+      URI('https://mds.certinfra.fidoalliance.org/getEndpoints'),
       { endpoint: WebAuthn.configuration.origin }.to_json,
       FidoMetadata::Client::DEFAULT_HEADERS
     )
 
     response.value
-    possible_endpoints = JSON.parse(response.body)["result"]
+    possible_endpoints = JSON.parse(response.body)['result']
 
     client = FidoMetadata::Client.new(nil)
 
@@ -42,19 +42,19 @@ class ConformanceCacheStore < FidoMetadata::TestCacheStore
         end
       end
 
-    if json.is_a?(Hash) && json.keys == ["legalHeader", "no", "nextUpdate", "entries"]
-      puts("TOC setup done!")
+    if json.is_a?(Hash) && json.keys == %w[legalHeader no nextUpdate entries]
+      puts('TOC setup done!')
       toc = FidoMetadata::TableOfContents.from_json(json)
-      write("metadata_toc", toc)
+      write('metadata_toc', toc)
     else
-      puts("Unable to setup TOC!")
+      puts('Unable to setup TOC!')
     end
   end
 
   private
 
   def conformance_certificates
-    file = File.read(File.join(__dir__, "MDSROOT.crt"))
+    file = File.read(File.join(__dir__, 'MDSROOT.crt'))
 
     [OpenSSL::X509::Certificate.new(file)]
   end

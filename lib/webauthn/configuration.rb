@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "openssl"
-require "webauthn/encoder"
-require "webauthn/error"
+require 'openssl'
+require 'webauthn/encoder'
+require 'webauthn/error'
 
 module WebAuthn
   def self.configuration
@@ -16,7 +16,7 @@ module WebAuthn
   class RootCertificateFinderNotSupportedError < Error; end
 
   class Configuration
-    DEFAULT_ALGORITHMS = ["ES256", "PS256", "RS256"].compact.freeze
+    DEFAULT_ALGORITHMS = %w[ES256 PS256 RS256].compact.freeze
 
     attr_accessor :algorithms
     attr_accessor :encoding
@@ -33,9 +33,9 @@ module WebAuthn
       @algorithms = DEFAULT_ALGORITHMS.dup
       @encoding = WebAuthn::Encoder::STANDARD_ENCODING
       @verify_attestation_statement = true
-      @credential_options_timeout = 120000
+      @credential_options_timeout = 120_000
       @silent_authentication = false
-      @acceptable_attestation_types = ['None', 'Self', 'Basic', 'AttCA', 'Basic_or_AttCA', 'AnonCA']
+      @acceptable_attestation_types = %w[None Self Basic AttCA Basic_or_AttCA AnonCA]
       @attestation_root_certificates_finders = []
     end
 
@@ -46,14 +46,10 @@ module WebAuthn
     end
 
     def attestation_root_certificates_finders=(finders)
-      if !finders.respond_to?(:each)
-        finders = [finders]
-      end
+      finders = [finders] unless finders.respond_to?(:each)
 
       finders.each do |finder|
-        unless finder.respond_to?(:find)
-          raise RootCertificateFinderNotSupportedError, "Finder must implement `find` method"
-        end
+        raise RootCertificateFinderNotSupportedError, 'Finder must implement `find` method' unless finder.respond_to?(:find)
       end
 
       @attestation_root_certificates_finders = finders

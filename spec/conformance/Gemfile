@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-ruby "~> 2.7.0"
+ruby '~> 2.7.0'
 
-gem "byebug"
-gem "fido_metadata", "~> 0.4.0"
-gem "rack-contrib"
-gem "rubyzip"
-gem "sinatra", "~> 2.0"
-gem "sinatra-contrib"
-gem "webauthn", path: File.join("..", "..")
+gem 'byebug'
+gem 'fido_metadata', '~> 0.4.0'
+gem 'rack-contrib'
+gem 'rubyzip'
+gem 'sinatra', '~> 2.0'
+gem 'sinatra-contrib'
+gem 'webauthn', path: File.join('..', '..')

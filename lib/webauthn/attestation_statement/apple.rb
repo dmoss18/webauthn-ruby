@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "openssl"
-require "webauthn/attestation_statement/base"
+require 'openssl'
+require 'webauthn/attestation_statement/base'
 
 module WebAuthn
   module AttestationStatement
@@ -25,7 +25,7 @@ module WebAuthn
           -----END CERTIFICATE-----
         PEM
 
-      NONCE_EXTENSION_OID = "1.2.840.113635.100.8.2"
+      NONCE_EXTENSION_OID = '1.2.840.113635.100.8.2'
 
       def valid?(authenticator_data, client_data_hash, _options = {})
         valid_nonce?(authenticator_data, client_data_hash) &&
@@ -38,15 +38,14 @@ module WebAuthn
 
       def valid_nonce?(authenticator_data, client_data_hash)
         extension = cred_cert&.extensions&.detect { |ext| ext.oid == NONCE_EXTENSION_OID }
+        return false unless extension
 
-        if extension
-          sequence = OpenSSL::ASN1.decode(OpenSSL::ASN1.decode(extension.to_der).value[1].value)
+        sequence = OpenSSL::ASN1.decode(OpenSSL::ASN1.decode(extension.to_der).value[1].value)
 
-          sequence.tag == OpenSSL::ASN1::SEQUENCE &&
-            sequence.value.size == 1 &&
-            sequence.value[0].value[0].value ==
-              OpenSSL::Digest::SHA256.digest(authenticator_data.data + client_data_hash)
-        end
+        sequence.tag == OpenSSL::ASN1::SEQUENCE &&
+          sequence.value.size == 1 &&
+          sequence.value[0].value[0].value ==
+            OpenSSL::Digest::SHA256.digest(authenticator_data.data + client_data_hash)
       end
 
       def attestation_type

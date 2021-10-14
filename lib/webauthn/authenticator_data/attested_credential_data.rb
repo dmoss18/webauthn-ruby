@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "bindata"
-require "cose/key"
-require "webauthn/error"
+require 'bindata'
+require 'cose/key'
+require 'webauthn/error'
 
 module WebAuthn
   class AttestedCredentialDataFormatError < WebAuthn::Error; end
@@ -41,20 +41,16 @@ module WebAuthn
       end
 
       def aaguid
-        raw_aaguid.unpack("H8H4H4H4H12").join("-")
+        raw_aaguid.unpack('H8H4H4H4H12').join('-')
       end
 
       def credential
         @credential ||=
-          if valid?
-            Credential.new(id, public_key)
-          end
+          (Credential.new(id, public_key) if valid?)
       end
 
       def length
-        if valid?
-          AAGUID_LENGTH + ID_LENGTH_LENGTH + id_length + public_key_length
-        end
+        AAGUID_LENGTH + ID_LENGTH_LENGTH + id_length + public_key_length if valid?
       end
 
       private

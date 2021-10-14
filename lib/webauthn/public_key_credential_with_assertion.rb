@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "webauthn/authenticator_assertion_response"
-require "webauthn/public_key_credential"
+require 'webauthn/authenticator_assertion_response'
+require 'webauthn/public_key_credential'
 
 module WebAuthn
   class PublicKeyCredentialWithAssertion < PublicKeyCredential
@@ -23,9 +23,7 @@ module WebAuthn
     end
 
     def user_handle
-      if raw_user_handle
-        encoder.encode(raw_user_handle)
-      end
+      encoder.encode(raw_user_handle) if raw_user_handle
     end
 
     def raw_user_handle

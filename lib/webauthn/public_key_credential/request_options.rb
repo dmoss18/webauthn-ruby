@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "webauthn/public_key_credential/options"
+require 'webauthn/public_key_credential/options'
 
 module WebAuthn
   class PublicKeyCredential
@@ -27,9 +27,7 @@ module WebAuthn
       end
 
       def allow_credentials_from_allow
-        if allow
-          as_public_key_descriptors(allow)
-        end
+        as_public_key_descriptors(allow) if allow
       end
     end
   end

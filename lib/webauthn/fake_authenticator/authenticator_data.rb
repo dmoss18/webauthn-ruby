@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "cose/key"
-require "cbor"
-require "securerandom"
+require 'cose/key'
+require 'cbor'
+require 'securerandom'
 
 module WebAuthn
   class FakeAuthenticator
@@ -15,13 +15,13 @@ module WebAuthn
         rp_id_hash:,
         credential: {
           id: SecureRandom.random_bytes(16),
-          public_key: OpenSSL::PKey::EC.new("prime256v1").generate_key.public_key
+          public_key: OpenSSL::PKey::EC.new('prime256v1').generate_key.public_key
         },
         sign_count: 0,
         user_present: true,
         user_verified: !user_present,
         aaguid: AAGUID,
-        extensions: { "fakeExtension" => "fakeExtensionValue" }
+        extensions: { 'fakeExtension' => 'fakeExtensionValue' }
       )
         @rp_id_hash = rp_id_hash
         @credential = credential
@@ -52,7 +52,7 @@ module WebAuthn
             attested_credential_data_included_bit,
             extension_data_included_bit
           ].join
-        ].pack("b*")
+        ].pack('b*')
       end
 
       def serialized_sign_count
@@ -63,11 +63,11 @@ module WebAuthn
         @attested_credential_data ||=
           if credential
             @aaguid +
-              [credential[:id].length].pack("n*") +
+              [credential[:id].length].pack('n*') +
               credential[:id] +
               cose_credential_public_key
           else
-            ""
+            ''
           end
       end
 
@@ -75,36 +75,36 @@ module WebAuthn
         if extensions
           CBOR.encode(extensions)
         else
-          ""
+          ''
         end
       end
 
       def bit(flag)
         if context[flag]
-          "1"
+          '1'
         else
-          "0"
+          '0'
         end
       end
 
       def attested_credential_data_included_bit
         if attested_credential_data.empty?
-          "0"
+          '0'
         else
-          "1"
+          '1'
         end
       end
 
       def extension_data_included_bit
         if extension_data.empty?
-          "0"
+          '0'
         else
-          "1"
+          '1'
         end
       end
 
       def reserved_for_future_use_bit
-        "0"
+        '0'
       end
 
       def context
@@ -118,9 +118,9 @@ module WebAuthn
           key.alg = -257
         when OpenSSL::PKey::EC::Point
           alg = {
-            COSE::Key::Curve.by_name("P-256").id => -7,
-            COSE::Key::Curve.by_name("P-384").id => -35,
-            COSE::Key::Curve.by_name("P-521").id => -36
+            COSE::Key::Curve.by_name('P-256').id => -7,
+            COSE::Key::Curve.by_name('P-384').id => -35,
+            COSE::Key::Curve.by_name('P-521').id => -36
           }
 
           key = COSE::Key::EC2.from_pkey(credential[:public_key])

@@ -3,3 +3,9 @@ inherit_gem:
 
 Style/ClassAndModuleChildren:
   Enabled: false
+Metrics/ClassLength:
+  Max: 160
+Metrics/ParameterLists:
+  Max: 10
+Style/AsciiComments:
+  Enabled: false

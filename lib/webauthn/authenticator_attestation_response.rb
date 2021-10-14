@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-require "cbor"
-require "forwardable"
-require "uri"
-require "openssl"
+require 'cbor'
+require 'forwardable'
+require 'uri'
+require 'openssl'
 
-require "webauthn/attestation_object"
-require "webauthn/authenticator_response"
-require "webauthn/client_data"
-require "webauthn/encoder"
+require 'webauthn/attestation_object'
+require 'webauthn/authenticator_response'
+require 'webauthn/client_data'
+require 'webauthn/encoder'
 
 module WebAuthn
   class AttestationStatementVerificationError < VerificationError; end
@@ -22,8 +22,8 @@ module WebAuthn
       encoder = WebAuthn.configuration.encoder
 
       new(
-        attestation_object: encoder.decode(response["attestationObject"]),
-        client_data_json: encoder.decode(response["clientDataJSON"])
+        attestation_object: encoder.decode(response['attestationObject']),
+        client_data_json: encoder.decode(response['clientDataJSON'])
       )
     end
 
@@ -39,9 +39,7 @@ module WebAuthn
       super
 
       verify_item(:attested_credential)
-      if WebAuthn.configuration.verify_attestation_statement
-        verify_item(:attestation_statement)
-      end
+      verify_item(:attestation_statement) if WebAuthn.configuration.verify_attestation_statement
 
       true
     end
@@ -59,7 +57,7 @@ module WebAuthn
       :credential
     )
 
-    alias_method :attestation_certificate_key, :attestation_certificate_key_id
+    alias attestation_certificate_key attestation_certificate_key_id
 
     private
 

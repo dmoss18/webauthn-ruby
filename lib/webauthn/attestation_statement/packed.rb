@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "openssl"
-require "webauthn/attestation_statement/base"
+require 'openssl'
+require 'webauthn/attestation_statement/base'
 
 module WebAuthn
   # Implements https://www.w3.org/TR/2018/CR-webauthn-20180807/#packed-attestation
@@ -36,7 +36,7 @@ module WebAuthn
       def valid_ec_public_keys?(credential)
         (certificates&.map(&:public_key) || [credential.public_key_object])
           .select { |pkey| pkey.is_a?(OpenSSL::PKey::EC) }
-          .all? { |pkey| pkey.check_key }
+          .all?(&:check_key)
       end
 
       # Check https://www.w3.org/TR/2018/CR-webauthn-20180807/#packed-attestation-cert-requirements
@@ -45,7 +45,7 @@ module WebAuthn
           subject = attestation_certificate.subject.to_a
 
           attestation_certificate.version == 2 &&
-            subject.assoc('OU')&.at(1) == "Authenticator Attestation" &&
+            subject.assoc('OU')&.at(1) == 'Authenticator Attestation' &&
             attestation_certificate.extensions.find { |ext| ext.oid == 'basicConstraints' }&.value == 'CA:FALSE'
         else
           true

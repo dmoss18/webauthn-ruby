@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "safety_net_attestation"
-require "openssl"
-require "webauthn/attestation_statement/base"
+require 'safety_net_attestation'
+require 'openssl'
+require 'webauthn/attestation_statement/base'
 
 module WebAuthn
   module AttestationStatement
@@ -31,7 +31,7 @@ module WebAuthn
 
       # TODO: improve once the spec has clarifications https://github.com/w3c/webauthn/issues/968
       def valid_version?
-        !statement["ver"].empty?
+        !statement['ver'].empty?
       end
 
       def cts_profile_match?
@@ -53,7 +53,7 @@ module WebAuthn
       end
 
       def attestation_response
-        @attestation_response ||= SafetyNetAttestation::Statement.new(statement["response"])
+        @attestation_response ||= SafetyNetAttestation::Statement.new(statement['response'])
       end
 
       def default_root_certificates

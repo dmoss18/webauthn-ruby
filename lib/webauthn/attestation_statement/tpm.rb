@@ -1,20 +1,20 @@
 # frozen_string_literal: true
 
-require "cose/algorithm"
-require "openssl"
-require "tpm/key_attestation"
-require "webauthn/attestation_statement/base"
+require 'cose/algorithm'
+require 'openssl'
+require 'tpm/key_attestation'
+require 'webauthn/attestation_statement/base'
 
 module WebAuthn
   module AttestationStatement
     class TPM < Base
-      TPM_V2 = "2.0"
+      TPM_V2 = '2.0'
 
       COSE_ALG_TO_TPM = {
-        "RS1" => { signature: ::TPM::ALG_RSASSA, hash: ::TPM::ALG_SHA1 },
-        "RS256" => { signature: ::TPM::ALG_RSASSA, hash: ::TPM::ALG_SHA256 },
-        "PS256" => { signature: ::TPM::ALG_RSAPSS, hash: ::TPM::ALG_SHA256 },
-        "ES256" => { signature: ::TPM::ALG_ECDSA, hash: ::TPM::ALG_SHA256 },
+        'RS1' => { signature: ::TPM::ALG_RSASSA, hash: ::TPM::ALG_SHA1 },
+        'RS256' => { signature: ::TPM::ALG_RSASSA, hash: ::TPM::ALG_SHA256 },
+        'PS256' => { signature: ::TPM::ALG_RSAPSS, hash: ::TPM::ALG_SHA256 },
+        'ES256' => { signature: ::TPM::ALG_ECDSA, hash: ::TPM::ALG_SHA256 }
       }.freeze
 
       def valid?(authenticator_data, client_data_hash, _options = {})
@@ -35,9 +35,9 @@ module WebAuthn
       def valid_key_attestation?(certified_extra_data, key, aaguid)
         key_attestation =
           ::TPM::KeyAttestation.new(
-            statement["certInfo"],
+            statement['certInfo'],
             signature,
-            statement["pubArea"],
+            statement['pubArea'],
             certificates,
             OpenSSL::Digest.digest(cose_algorithm.hash_function, certified_extra_data),
             signature_algorithm: tpm_algorithm[:signature],
@@ -62,7 +62,7 @@ module WebAuthn
       end
 
       def ver
-        statement["ver"]
+        statement['ver']
       end
 
       def cose_algorithm
@@ -70,11 +70,9 @@ module WebAuthn
       end
 
       def attestation_type
-        if raw_certificates
-          ATTESTATION_TYPE_ATTCA
-        else
-          raise "Attestation type invalid"
-        end
+        raise 'Attestation type invalid' unless raw_certificates
+
+        ATTESTATION_TYPE_ATTCA
       end
     end
   end

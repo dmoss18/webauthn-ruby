@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require "cbor"
-require "openssl"
-require "securerandom"
-require "webauthn/fake_authenticator/attestation_object"
-require "webauthn/fake_authenticator/authenticator_data"
+require 'cbor'
+require 'openssl'
+require 'securerandom'
+require 'webauthn/fake_authenticator/attestation_object'
+require 'webauthn/fake_authenticator/authenticator_data'
 
 module WebAuthn
   class FakeAuthenticator
@@ -55,39 +55,37 @@ module WebAuthn
     )
       credential_options = credentials[rp_id]
 
-      if credential_options
-        allow_credentials ||= credential_options.keys
-        credential_id = (credential_options.keys & allow_credentials).first
-        unless credential_id
-          raise "No matching credentials (allowed=#{allow_credentials}) " \
-                "found for RP #{rp_id} among credentials=#{credential_options}"
-        end
+      raise "No credentials found for RP #{rp_id}" unless credential_options
 
-        credential = credential_options[credential_id]
-        credential_key = credential[:credential_key]
-        credential_sign_count = credential[:sign_count]
-
-        authenticator_data = AuthenticatorData.new(
-          rp_id_hash: hashed(rp_id),
-          user_present: user_present,
-          user_verified: user_verified,
-          aaguid: aaguid,
-          credential: nil,
-          sign_count: sign_count || credential_sign_count,
-          extensions: extensions
-        ).serialize
-
-        signature = credential_key.sign("SHA256", authenticator_data + client_data_hash)
-        credential[:sign_count] += 1
-
-        {
-          credential_id: credential_id,
-          authenticator_data: authenticator_data,
-          signature: signature
-        }
-      else
-        raise "No credentials found for RP #{rp_id}"
+      allow_credentials ||= credential_options.keys
+      credential_id = (credential_options.keys & allow_credentials).first
+      unless credential_id
+        raise "No matching credentials (allowed=#{allow_credentials}) " \
+              "found for RP #{rp_id} among credentials=#{credential_options}"
       end
+
+      credential = credential_options[credential_id]
+      credential_key = credential[:credential_key]
+      credential_sign_count = credential[:sign_count]
+
+      authenticator_data = AuthenticatorData.new(
+        rp_id_hash: hashed(rp_id),
+        user_present: user_present,
+        user_verified: user_verified,
+        aaguid: aaguid,
+        credential: nil,
+        sign_count: sign_count || credential_sign_count,
+        extensions: extensions
+      ).serialize
+
+      signature = credential_key.sign('SHA256', authenticator_data + client_data_hash)
+      credential[:sign_count] += 1
+
+      {
+        credential_id: credential_id,
+        authenticator_data: authenticator_data,
+        signature: signature
+      }
     end
 
     private
@@ -95,7 +93,7 @@ module WebAuthn
     attr_reader :credentials
 
     def new_credential
-      [SecureRandom.random_bytes(16), OpenSSL::PKey::EC.new("prime256v1").generate_key, 0]
+      [SecureRandom.random_bytes(16), OpenSSL::PKey::EC.new('prime256v1').generate_key, 0]
     end
 
     def hashed(target)

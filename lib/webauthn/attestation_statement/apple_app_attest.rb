@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "openssl"
-require "webauthn/attestation_statement/base"
-require_relative "./apple"
+require 'openssl'
+require 'webauthn/attestation_statement/base'
+require_relative './apple'
 
 module WebAuthn
   module AttestationStatement

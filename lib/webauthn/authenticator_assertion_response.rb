@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require "webauthn/authenticator_data"
-require "webauthn/authenticator_response"
-require "webauthn/encoder"
-require "webauthn/public_key"
+require 'webauthn/authenticator_data'
+require 'webauthn/authenticator_response'
+require 'webauthn/encoder'
+require 'webauthn/public_key'
 
 module WebAuthn
   class SignatureVerificationError < VerificationError; end
@@ -14,14 +14,12 @@ module WebAuthn
       encoder = WebAuthn.configuration.encoder
 
       user_handle =
-        if response["userHandle"]
-          encoder.decode(response["userHandle"])
-        end
+        (encoder.decode(response['userHandle']) if response['userHandle'])
 
       new(
-        authenticator_data: encoder.decode(response["authenticatorData"]),
-        client_data_json: encoder.decode(response["clientDataJSON"]),
-        signature: encoder.decode(response["signature"]),
+        authenticator_data: encoder.decode(response['authenticatorData']),
+        client_data_json: encoder.decode(response['clientDataJSON']),
+        signature: encoder.decode(response['signature']),
         user_handle: user_handle
       )
     end

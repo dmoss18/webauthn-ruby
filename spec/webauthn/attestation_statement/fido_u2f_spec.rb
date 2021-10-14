@@ -1,20 +1,20 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+require 'spec_helper'
 
-require "json"
-require "openssl"
-require "webauthn/attestation_statement/fido_u2f"
+require 'json'
+require 'openssl'
+require 'webauthn/attestation_statement/fido_u2f'
 
-RSpec.describe "FidoU2f attestation" do
-  describe "#valid?" do
+RSpec.describe 'FidoU2f attestation' do
+  describe '#valid?' do
     let(:credential_public_key) { create_ec_key.public_key }
     let(:client_data_hash) { OpenSSL::Digest::SHA256.digest({}.to_json) }
 
     let(:authenticator_data_bytes) do
       WebAuthn::FakeAuthenticator::AuthenticatorData.new(
-        rp_id_hash: OpenSSL::Digest.digest("SHA256", "RP"),
-        credential: { id: "0".b * 16, public_key: credential_public_key },
+        rp_id_hash: OpenSSL::Digest.digest('SHA256', 'RP'),
+        credential: { id: '0'.b * 16, public_key: credential_public_key },
         aaguid: WebAuthn::AuthenticatorData::AttestedCredentialData::ZEROED_AAGUID
       ).serialize
     end
@@ -29,7 +29,7 @@ RSpec.describe "FidoU2f attestation" do
     end
 
     let(:attestation_key) { create_ec_key }
-    let(:signature) { attestation_key.sign("SHA256", to_be_signed) }
+    let(:signature) { attestation_key.sign('SHA256', to_be_signed) }
 
     let(:attestation_certificate) do
       issue_certificate(root_certificate, root_key, attestation_key).to_der
@@ -37,8 +37,8 @@ RSpec.describe "FidoU2f attestation" do
 
     let(:statement) do
       WebAuthn::AttestationStatement::FidoU2f.new(
-        "sig" => signature,
-        "x5c" => [attestation_certificate]
+        'sig' => signature,
+        'x5c' => [attestation_certificate]
       )
     end
 
@@ -56,92 +56,92 @@ RSpec.describe "FidoU2f attestation" do
       expect(statement.valid?(authenticator_data, client_data_hash)).to be_truthy
     end
 
-    context "when signature is invalid" do
-      context "because it was signed with a different signing key (self attested)" do
-        let(:signature) { create_ec_key.sign("SHA256", to_be_signed) }
+    context 'when signature is invalid' do
+      context 'because it was signed with a different signing key (self attested)' do
+        let(:signature) { create_ec_key.sign('SHA256', to_be_signed) }
 
-        it "fails" do
+        it 'fails' do
           expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
         end
       end
 
-      context "because it was signed over different data" do
-        let(:to_be_signed) { "other data" }
+      context 'because it was signed over different data' do
+        let(:to_be_signed) { 'other data' }
 
-        it "fails" do
+        it 'fails' do
           expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
         end
       end
 
-      context "because it is corrupted" do
-        let(:signature) { "corrupted signature".b }
+      context 'because it is corrupted' do
+        let(:signature) { 'corrupted signature'.b }
 
-        it "fails" do
+        it 'fails' do
           expect { statement.valid?(authenticator_data, client_data_hash) }.to raise_error(OpenSSL::PKey::PKeyError)
         end
       end
     end
 
-    context "when the attested credential public key is invalid" do
-      context "because the coordinates are longer than expected" do
+    context 'when the attested credential public key is invalid' do
+      context 'because the coordinates are longer than expected' do
         let(:credential_public_key) do
-          WebAuthn.configuration.algorithms << "ES384"
+          WebAuthn.configuration.algorithms << 'ES384'
 
-          OpenSSL::PKey::EC.new("secp384r1").generate_key.public_key
+          OpenSSL::PKey::EC.new('secp384r1').generate_key.public_key
         end
 
-        it "fails" do
+        it 'fails' do
           expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
         end
       end
     end
 
-    context "when the attestation certificate is invalid" do
-      context "because there are too many" do
+    context 'when the attestation certificate is invalid' do
+      context 'because there are too many' do
         let(:statement) do
           WebAuthn::AttestationStatement::FidoU2f.new(
-            "sig" => signature,
-            "x5c" => [attestation_certificate, attestation_certificate]
+            'sig' => signature,
+            'x5c' => [attestation_certificate, attestation_certificate]
           )
         end
 
-        it "fails" do
+        it 'fails' do
           expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
         end
       end
 
-      context "because it is not of the correct type" do
+      context 'because it is not of the correct type' do
         let(:attestation_key) { create_rsa_key }
 
-        it "fails" do
+        it 'fails' do
           expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
         end
       end
 
-      context "because it is not of the correct curve" do
-        let(:attestation_key) { OpenSSL::PKey::EC.new("secp384r1").generate_key }
+      context 'because it is not of the correct curve' do
+        let(:attestation_key) { OpenSSL::PKey::EC.new('secp384r1').generate_key }
 
-        it "fails" do
+        it 'fails' do
           expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
         end
       end
     end
 
-    context "when the AAGUID is invalid" do
+    context 'when the AAGUID is invalid' do
       let(:authenticator_data_bytes) do
         WebAuthn::FakeAuthenticator::AuthenticatorData.new(
-          rp_id_hash: OpenSSL::Digest.digest("SHA256", "RP"),
-          credential: { id: "0".b * 16, public_key: credential_public_key },
+          rp_id_hash: OpenSSL::Digest.digest('SHA256', 'RP'),
+          credential: { id: '0'.b * 16, public_key: credential_public_key },
           aaguid: SecureRandom.random_bytes(16)
         ).serialize
       end
 
-      it "fails" do
+      it 'fails' do
         expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
       end
     end
 
-    context "when the certificate chain is invalid" do
+    context 'when the certificate chain is invalid' do
       context "when finder doesn't have correct certificate" do
         before do
           WebAuthn.configuration.attestation_root_certificates_finders = finder_for(
@@ -150,7 +150,7 @@ RSpec.describe "FidoU2f attestation" do
           )
         end
 
-        it "returns false" do
+        it 'returns false' do
           expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
         end
       end

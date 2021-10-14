@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "webauthn/encoder"
+require 'webauthn/encoder'
 
 module WebAuthn
   class PublicKeyCredential
@@ -8,11 +8,11 @@ module WebAuthn
 
     def self.from_client(credential, response_class_override = nil)
       new(
-        type: credential["type"],
-        id: credential["id"],
-        raw_id: WebAuthn.configuration.encoder.decode(credential["rawId"]),
-        client_extension_outputs: credential["clientExtensionResults"],
-        response: (response_class_override || response_class).from_client(credential["response"])
+        type: credential['type'],
+        id: credential['id'],
+        raw_id: WebAuthn.configuration.encoder.decode(credential['rawId']),
+        client_extension_outputs: credential['clientExtensionResults'],
+        response: (response_class_override || response_class).from_client(credential['response'])
       )
     end
 
@@ -25,8 +25,8 @@ module WebAuthn
     end
 
     def verify(*_args)
-      valid_type? || raise("invalid type")
-      valid_id? || raise("invalid id")
+      valid_type? || raise('invalid type')
+      valid_id? || raise('invalid id')
 
       true
     end

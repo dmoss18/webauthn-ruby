@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "securecompare"
+require 'securecompare'
 
 module WebAuthn
   module SecurityUtils

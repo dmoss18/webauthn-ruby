@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "awrence"
+require 'awrence'
 
 module WebAuthn
   class PublicKeyCredential
@@ -23,13 +23,9 @@ module WebAuthn
         attributes.each do |attribute_name|
           value = send(attribute_name)
 
-          if value.respond_to?(:as_json)
-            value = value.as_json
-          end
+          value = value.as_json if value.respond_to?(:as_json)
 
-          if value
-            hash[attribute_name] = value
-          end
+          hash[attribute_name] = value if value
         end
 
         hash

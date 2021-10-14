@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "webauthn/attestation_statement/base"
+require 'webauthn/attestation_statement/base'
 
 module WebAuthn
   module AttestationStatement

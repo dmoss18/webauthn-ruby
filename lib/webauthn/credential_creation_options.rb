@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require "cose/algorithm"
-require "webauthn/credential_options"
-require "webauthn/credential_rp_entity"
-require "webauthn/credential_user_entity"
+require 'cose/algorithm'
+require 'webauthn/credential_options'
+require 'webauthn/credential_rp_entity'
+require 'webauthn/credential_user_entity'
 
 module WebAuthn
-  def self.credential_creation_options(rp_name: nil, user_name: "web-user", display_name: "web-user", user_id: "1")
+  def self.credential_creation_options(rp_name: nil, user_name: 'web-user', display_name: 'web-user', user_id: '1')
     warn(
-      "DEPRECATION WARNING: `WebAuthn.credential_creation_options` is deprecated."\
-      " Please use `WebAuthn::Credential.options_for_create` instead."
+      'DEPRECATION WARNING: `WebAuthn.credential_creation_options` is deprecated.'\
+      ' Please use `WebAuthn::Credential.options_for_create` instead.'
     )
 
     CredentialCreationOptions.new(
@@ -18,7 +18,7 @@ module WebAuthn
   end
 
   class CredentialCreationOptions < CredentialOptions
-    DEFAULT_RP_NAME = "web-server"
+    DEFAULT_RP_NAME = 'web-server'
 
     attr_accessor :attestation, :authenticator_selection, :exclude_credentials, :extensions
 
@@ -53,28 +53,20 @@ module WebAuthn
         rp: { name: rp.name }
       }
 
-      if attestation
-        options[:attestation] = attestation
-      end
+      options[:attestation] = attestation if attestation
 
-      if authenticator_selection
-        options[:authenticatorSelection] = authenticator_selection
-      end
+      options[:authenticatorSelection] = authenticator_selection if authenticator_selection
 
-      if exclude_credentials
-        options[:excludeCredentials] = exclude_credentials
-      end
+      options[:excludeCredentials] = exclude_credentials if exclude_credentials
 
-      if extensions
-        options[:extensions] = extensions
-      end
+      options[:extensions] = extensions if extensions
 
       options
     end
 
     def pub_key_cred_params
       configuration.algorithms.map do |alg_name|
-        { type: "public-key", alg: COSE::Algorithm.by_name(alg_name).id }
+        { type: 'public-key', alg: COSE::Algorithm.by_name(alg_name).id }
       end
     end
 

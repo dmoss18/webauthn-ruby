@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-require "cbor"
-require "forwardable"
-require "uri"
-require "openssl"
+require 'cbor'
+require 'forwardable'
+require 'uri'
+require 'openssl'
 
-require "webauthn/attestation_object"
-require "webauthn/authenticator_attestation_response"
-require "webauthn/client_data"
-require "webauthn/encoder"
+require 'webauthn/attestation_object'
+require 'webauthn/authenticator_attestation_response'
+require 'webauthn/client_data'
+require 'webauthn/encoder'
 
 module WebAuthn
   class AppIdVerificationError < VerificationError; end
@@ -34,7 +34,8 @@ module WebAuthn
       @key_id = key_id
     end
 
-    def verify(expected_challenge, expected_origin = nil, user_verification: nil, rp_id: nil)
+    # rubocop:disable Lint/UnusedMethodArgument
+    def verify(expected_challenge, _expected_origin = nil, user_verification: nil, rp_id: nil)
       verify_item(:challenge, expected_challenge)
       verify_item(:authenticator_data)
       verify_item(:attested_credential)
@@ -44,6 +45,7 @@ module WebAuthn
 
       true
     end
+    # rubocop:enable Lint/UnusedMethodArgument
 
     def client_data_json
       @client_data_json ||= { challenge: challenge }.to_json
@@ -60,7 +62,10 @@ module WebAuthn
 
     def valid_attestation_statement?
       client_data_hash = Digest::SHA256.digest(challenge)
-      @attestation_type, @attestation_trust_path = attestation_object.valid_attestation_statement?(client_data_hash, { app_id: app_id, key_id: key_id })
+      @attestation_type, @attestation_trust_path = attestation_object.valid_attestation_statement?(
+        client_data_hash,
+        { app_id: app_id, key_id: key_id }
+      )
     end
   end
 end

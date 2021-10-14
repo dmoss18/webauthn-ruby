@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "cbor"
-require "webauthn/fake_authenticator/authenticator_data"
+require 'cbor'
+require 'webauthn/fake_authenticator/authenticator_data'
 
 module WebAuthn
   class FakeAuthenticator
@@ -30,9 +30,9 @@ module WebAuthn
 
       def serialize
         CBOR.encode(
-          "fmt" => "none",
-          "attStmt" => {},
-          "authData" => authenticator_data.serialize
+          'fmt' => 'none',
+          'attStmt' => {},
+          'authData' => authenticator_data.serialize
         )
       end
 
@@ -54,9 +54,7 @@ module WebAuthn
         @authenticator_data ||=
           begin
             credential_data =
-              if attested_credential_data
-                { id: credential_id, public_key: credential_key.public_key }
-              end
+              ({ id: credential_id, public_key: credential_key.public_key } if attested_credential_data)
 
             AuthenticatorData.new(
               rp_id_hash: rp_id_hash,

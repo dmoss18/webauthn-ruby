@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+require 'spec_helper'
 
 RSpec.describe WebAuthn::AuthenticatorData::AttestedCredentialData do
   let(:cose_key_data) { fake_cose_credential_key }
@@ -12,12 +12,12 @@ RSpec.describe WebAuthn::AuthenticatorData::AttestedCredentialData do
       public_key: cose_key_data
     }.merge(options)
 
-    options[:aaguid] + [options[:id].length].pack("n*") + options[:id] + options[:public_key]
+    options[:aaguid] + [options[:id].length].pack('n*') + options[:id] + options[:public_key]
   end
 
-  describe "#valid?" do
-    it "returns false if public key is missing" do
-      raw_data = raw_attested_credential_data(public_key: CBOR.encode(""))
+  describe '#valid?' do
+    it 'returns false if public key is missing' do
+      raw_data = raw_attested_credential_data(public_key: CBOR.encode(''))
 
       attested_credential_data =
         WebAuthn::AuthenticatorData::AttestedCredentialData.deserialize(raw_data)
@@ -36,12 +36,12 @@ RSpec.describe WebAuthn::AuthenticatorData::AttestedCredentialData do
       expect(attested_credential_data.credential).to eq(nil)
     end
 
-    it "returns true if all data is present" do
-      raw_data = raw_attested_credential_data(id: "this-is-a-credential-id")
+    it 'returns true if all data is present' do
+      raw_data = raw_attested_credential_data(id: 'this-is-a-credential-id')
       attested_credential_data = WebAuthn::AuthenticatorData::AttestedCredentialData.deserialize(raw_data)
 
       expect(attested_credential_data.valid?).to be_truthy
-      expect(attested_credential_data.credential.id).to eq("this-is-a-credential-id")
+      expect(attested_credential_data.credential.id).to eq('this-is-a-credential-id')
       expect(attested_credential_data.credential.public_key).to eq(cose_key_data)
     end
   end

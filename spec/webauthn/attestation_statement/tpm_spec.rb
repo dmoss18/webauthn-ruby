@@ -1,25 +1,25 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+require 'spec_helper'
 
-require "json"
-require "openssl"
-require "webauthn/attestation_statement/tpm"
+require 'json'
+require 'openssl'
+require 'webauthn/attestation_statement/tpm'
 
-require "tpm/constants"
-require "tpm/sized_buffer"
-require "tpm/s_attest"
-require "tpm/t_public"
+require 'tpm/constants'
+require 'tpm/sized_buffer'
+require 'tpm/s_attest'
+require 'tpm/t_public'
 
-RSpec.describe "TPM attestation statement" do
-  describe "#valid?" do
-    context "AttCA attestation" do
+RSpec.describe 'TPM attestation statement' do
+  describe '#valid?' do
+    context 'AttCA attestation' do
       let(:authenticator_data) { WebAuthn::AuthenticatorData.deserialize(authenticator_data_bytes) }
 
       let(:authenticator_data_bytes) do
         WebAuthn::FakeAuthenticator::AuthenticatorData.new(
-          rp_id_hash: OpenSSL::Digest.digest("SHA256", "RP"),
-          credential: { id: "0".b * 16, public_key: credential_key.public_key },
+          rp_id_hash: OpenSSL::Digest.digest('SHA256', 'RP'),
+          credential: { id: '0'.b * 16, public_key: credential_key.public_key }
         ).serialize
       end
 
@@ -41,22 +41,22 @@ RSpec.describe "TPM attestation statement" do
           not_before: aik_certificate_start_time,
           not_after: aik_certificate_end_time,
           extensions: [
-            extension_factory.create_extension("basicConstraints", aik_certificate_basic_constraints, true),
-            extension_factory.create_extension("extendedKeyUsage", aik_certificate_extended_key_usage),
-            extension_factory.create_extension("subjectAltName", "ASN1:SEQUENCE:dir_seq", aik_certificate_san_critical),
+            extension_factory.create_extension('basicConstraints', aik_certificate_basic_constraints, true),
+            extension_factory.create_extension('extendedKeyUsage', aik_certificate_extended_key_usage),
+            extension_factory.create_extension('subjectAltName', 'ASN1:SEQUENCE:dir_seq', aik_certificate_san_critical)
           ]
         )
       end
 
       let(:aik) { create_rsa_key }
       let(:aik_certificate_version) { 2 }
-      let(:aik_certificate_subject) { "" }
-      let(:aik_certificate_basic_constraints) { "CA:FALSE" }
+      let(:aik_certificate_subject) { '' }
+      let(:aik_certificate_basic_constraints) { 'CA:FALSE' }
       let(:aik_certificate_extended_key_usage) { ::TPM::AIKCertificate::OID_TCG_KP_AIK_CERTIFICATE }
       let(:aik_certificate_san_critical) { true }
-      let(:aik_certificate_san_manufacturer) { "id:4E544300" }
-      let(:aik_certificate_san_model) { "TPM test model" }
-      let(:aik_certificate_san_version) { "id:42" }
+      let(:aik_certificate_san_manufacturer) { 'id:4E544300' }
+      let(:aik_certificate_san_model) { 'TPM test model' }
+      let(:aik_certificate_san_version) { 'id:42' }
       let(:aik_certificate_san_config) do
         OpenSSL::Config.parse(<<~OPENSSL_CONF)
           [dir_seq]
@@ -87,7 +87,7 @@ RSpec.describe "TPM attestation statement" do
       let(:aik_certificate_end_time) { Time.now + 60 }
       let(:root_key) { create_rsa_key }
       let(:root_certificate) { create_root_certificate(root_key) }
-      let(:signature) { aik.sign("SHA256", cert_info) }
+      let(:signature) { aik.sign('SHA256', cert_info) }
 
       let(:cert_info) do
         s_attest = ::TPM::SAttest.new
@@ -108,7 +108,7 @@ RSpec.describe "TPM attestation statement" do
         t_public.alg_type = ::TPM::ALG_RSA
         t_public.name_alg = name_alg
         t_public.parameters = pub_area_parameters
-        t_public.unique.buffer = credential_key.params["n"].to_s(2)
+        t_public.unique.buffer = credential_key.params['n'].to_s(2)
 
         t_public.to_binary_s
       end
@@ -122,16 +122,16 @@ RSpec.describe "TPM attestation statement" do
         }
       end
 
-      let(:tpm_version) { "2.0" }
+      let(:tpm_version) { '2.0' }
 
       let(:statement) do
         WebAuthn::AttestationStatement::TPM.new(
-          "ver" => tpm_version,
-          "alg" => algorithm,
-          "x5c" => [aik_certificate.to_der],
-          "sig" => signature,
-          "certInfo" => cert_info,
-          "pubArea" => pub_area
+          'ver' => tpm_version,
+          'alg' => algorithm,
+          'x5c' => [aik_certificate.to_der],
+          'sig' => signature,
+          'certInfo' => cert_info,
+          'pubArea' => pub_area
         )
       end
 
@@ -150,23 +150,23 @@ RSpec.describe "TPM attestation statement" do
         expect(statement.valid?(authenticator_data, client_data_hash)).to be_truthy
       end
 
-      context "when the attestation certificate is not signed by a TPM" do
+      context 'when the attestation certificate is not signed by a TPM' do
         let(:tpm_certificates) do
           [create_root_certificate(create_rsa_key)]
         end
 
-        it "fails" do
+        it 'fails' do
           expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
         end
 
-        it "returns true if they are configured" do
+        it 'returns true if they are configured' do
           WebAuthn.configuration.attestation_root_certificates_finders = finder_for(root_certificate)
 
           expect(statement.valid?(authenticator_data, client_data_hash)).to be_truthy
         end
       end
 
-      context "when EC algorithm" do
+      context 'when EC algorithm' do
         let(:algorithm) { -7 }
         let(:aik) { create_ec_key }
         let(:credential_key) { create_ec_key }
@@ -190,11 +190,11 @@ RSpec.describe "TPM attestation statement" do
           }
         end
 
-        it "works" do
+        it 'works' do
           expect(statement.valid?(authenticator_data, client_data_hash)).to be_truthy
         end
 
-        context "when pubArea is invalid" do
+        context 'when pubArea is invalid' do
           context "because unique field doesn't represent the same key as credentialPublicKey" do
             let(:pub_area) do
               t_public = ::TPM::TPublic.new
@@ -206,13 +206,13 @@ RSpec.describe "TPM attestation statement" do
               t_public.to_binary_s
             end
 
-            it "returns false" do
+            it 'returns false' do
               expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
             end
           end
 
-          context "because parameters are invalid" do
-            context "because symmetric is not null" do
+          context 'because parameters are invalid' do
+            context 'because symmetric is not null' do
               let(:pub_area_parameters) do
                 {
                   symmetric: ::TPM::ALG_NULL + 1,
@@ -222,7 +222,7 @@ RSpec.describe "TPM attestation statement" do
                 }
               end
 
-              it "returns false" do
+              it 'returns false' do
                 expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
               end
             end
@@ -237,7 +237,7 @@ RSpec.describe "TPM attestation statement" do
                 }
               end
 
-              it "returns false" do
+              it 'returns false' do
                 expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
               end
             end
@@ -252,7 +252,7 @@ RSpec.describe "TPM attestation statement" do
                 }
               end
 
-              it "returns false" do
+              it 'returns false' do
                 expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
               end
             end
@@ -260,10 +260,10 @@ RSpec.describe "TPM attestation statement" do
         end
       end
 
-      context "when RSA PSS algorithm" do
+      context 'when RSA PSS algorithm' do
         let(:algorithm) { -37 }
         let(:signature) do
-          aik.sign_pss("SHA256", cert_info, salt_length: :max, mgf1_hash: "SHA256")
+          aik.sign_pss('SHA256', cert_info, salt_length: :max, mgf1_hash: 'SHA256')
         end
 
         it "works if everything's fine" do
@@ -271,32 +271,32 @@ RSpec.describe "TPM attestation statement" do
         end
       end
 
-      context "when TPM version is not 2.0" do
-        let(:tpm_version) { "1.2" }
+      context 'when TPM version is not 2.0' do
+        let(:tpm_version) { '1.2' }
 
-        it "returns false" do
+        it 'returns false' do
           expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
         end
       end
 
-      context "when pubArea is invalid" do
+      context 'when pubArea is invalid' do
         context "because unique field doesn't represent the same key as credentialPublicKey" do
           let(:pub_area) do
             t_public = ::TPM::TPublic.new
             t_public.alg_type = ::TPM::ALG_RSA
             t_public.name_alg = name_alg
-            t_public.unique.buffer = create_rsa_key.params["n"].to_s(2)
+            t_public.unique.buffer = create_rsa_key.params['n'].to_s(2)
 
             t_public.to_binary_s
           end
 
-          it "returns false" do
+          it 'returns false' do
             expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
           end
         end
 
-        context "because parameters are invalid" do
-          context "because symmetric is not null" do
+        context 'because parameters are invalid' do
+          context 'because symmetric is not null' do
             let(:pub_area_parameters) do
               {
                 symmetric: ::TPM::ALG_NULL + 1,
@@ -306,7 +306,7 @@ RSpec.describe "TPM attestation statement" do
               }
             end
 
-            it "returns false" do
+            it 'returns false' do
               expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
             end
           end
@@ -321,7 +321,7 @@ RSpec.describe "TPM attestation statement" do
               }
             end
 
-            it "returns false" do
+            it 'returns false' do
               expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
             end
           end
@@ -336,58 +336,58 @@ RSpec.describe "TPM attestation statement" do
               }
             end
 
-            it "returns false" do
+            it 'returns false' do
               expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
             end
           end
         end
       end
 
-      context "when extraData is not the concatenation of auth data + client data hash" do
+      context 'when extraData is not the concatenation of auth data + client data hash' do
         let(:cert_info_extra_data) { OpenSSL::Digest::SHA256.digest(authenticator_data_bytes) }
 
-        it "returns false" do
+        it 'returns false' do
           expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
         end
       end
 
-      context "when signature is invalid" do
-        let(:signature) { "corrupted signature".b }
+      context 'when signature is invalid' do
+        let(:signature) { 'corrupted signature'.b }
 
-        it "returns false" do
+        it 'returns false' do
           expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
         end
       end
 
       context "when the AIK certificate doesn't meet requirements" do
-        context "because version is invalid" do
+        context 'because version is invalid' do
           let(:aik_certificate_version) { 1 }
 
-          it "returns false" do
+          it 'returns false' do
             expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
           end
         end
 
-        context "because subject is not empty" do
-          let(:aik_certificate_subject) { "/CN=CN" }
+        context 'because subject is not empty' do
+          let(:aik_certificate_subject) { '/CN=CN' }
 
-          it "returns false" do
+          it 'returns false' do
             expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
           end
         end
 
-        context "because Extended Key Usage extension is not tcg-kp-AIKCertificate OID" do
-          let(:aik_certificate_extended_key_usage) { "2.23.133.8.4" }
+        context 'because Extended Key Usage extension is not tcg-kp-AIKCertificate OID' do
+          let(:aik_certificate_extended_key_usage) { '2.23.133.8.4' }
 
-          it "returns false" do
+          it 'returns false' do
             expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
           end
         end
 
-        context "because Basic Constrains extension is not set to CA:FALSE" do
-          let(:aik_certificate_basic_constraints) { "CA:TRUE" }
+        context 'because Basic Constrains extension is not set to CA:FALSE' do
+          let(:aik_certificate_basic_constraints) { 'CA:TRUE' }
 
-          it "returns false" do
+          it 'returns false' do
             expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
           end
         end
@@ -395,48 +395,48 @@ RSpec.describe "TPM attestation statement" do
         context "because it hasn't yet started" do
           let(:aik_certificate_start_time) { Time.now + 10 }
 
-          it "returns false" do
+          it 'returns false' do
             expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
           end
         end
 
-        context "because it has expired" do
+        context 'because it has expired' do
           let(:aik_certificate_end_time) { Time.now - 1 }
 
-          it "returns false" do
+          it 'returns false' do
             expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
           end
         end
 
-        context "when the subject alternative name is invalid" do
-          context "because the extension is not critical" do
+        context 'when the subject alternative name is invalid' do
+          context 'because the extension is not critical' do
             let(:aik_certificate_san_critical) { false }
 
-            it "returns false" do
+            it 'returns false' do
               expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
             end
           end
 
-          context "because the manufacturer is unknown" do
-            let(:aik_certificate_san_manufacturer) { "id:F0000000" }
+          context 'because the manufacturer is unknown' do
+            let(:aik_certificate_san_manufacturer) { 'id:F0000000' }
 
-            it "returns false" do
+            it 'returns false' do
               expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
             end
           end
 
-          context "because the model is blank" do
-            let(:aik_certificate_san_model) { "" }
+          context 'because the model is blank' do
+            let(:aik_certificate_san_model) { '' }
 
-            it "returns false" do
+            it 'returns false' do
               expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
             end
           end
 
-          context "because the version is blank" do
-            let(:aik_certificate_san_version) { "" }
+          context 'because the version is blank' do
+            let(:aik_certificate_san_version) { '' }
 
-            it "returns false" do
+            it 'returns false' do
               expect(statement.valid?(authenticator_data, client_data_hash)).to be_falsy
             end
           end
@@ -444,21 +444,21 @@ RSpec.describe "TPM attestation statement" do
       end
     end
 
-    context "when attestation type is not specified" do
+    context 'when attestation type is not specified' do
       let(:statement) do
         WebAuthn::AttestationStatement::TPM.new(
-          "ver" => "2.0",
-          "alg" => -7,
-          "sig" => "sig",
-          "certInfo" => "cert-info",
-          "pubArea" => "pub-area"
+          'ver' => '2.0',
+          'alg' => -7,
+          'sig' => 'sig',
+          'certInfo' => 'cert-info',
+          'pubArea' => 'pub-area'
         )
       end
 
-      it "fails" do
-        expect {
-          statement.valid?("authenticator-data", "client-data-hash")
-        }.to raise_error("Attestation type invalid")
+      it 'fails' do
+        expect do
+          statement.valid?('authenticator-data', 'client-data-hash')
+        end.to raise_error('Attestation type invalid')
       end
     end
   end

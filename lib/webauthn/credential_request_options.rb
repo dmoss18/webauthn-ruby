@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require "webauthn/credential_options"
+require 'webauthn/credential_options'
 
 module WebAuthn
   def self.credential_request_options
     warn(
-      "DEPRECATION WARNING: `WebAuthn.credential_request_options` is deprecated."\
-      " Please use `WebAuthn::Credential.options_for_get` instead."
+      'DEPRECATION WARNING: `WebAuthn.credential_request_options` is deprecated.'\
+      ' Please use `WebAuthn::Credential.options_for_get` instead.'
     )
 
     CredentialRequestOptions.new.to_h
@@ -30,13 +30,9 @@ module WebAuthn
         allowCredentials: allow_credentials
       }
 
-      if extensions
-        options[:extensions] = extensions
-      end
+      options[:extensions] = extensions if extensions
 
-      if user_verification
-        options[:userVerification] = user_verification
-      end
+      options[:userVerification] = user_verification if user_verification
 
       options
     end

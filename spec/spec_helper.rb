@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require "bundler/setup"
-require "webauthn"
-require "cbor"
+require 'bundler/setup'
+require 'webauthn'
+require 'cbor'
 
-require "byebug"
-require "webauthn/fake_client"
+require 'byebug'
+require 'webauthn/fake_client'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
-  config.example_status_persistence_file_path = ".rspec_status"
+  config.example_status_persistence_file_path = '.rspec_status'
 
   # Disable RSpec exposing methods globally on `Module` and `main`
   config.disable_monkey_patching!
@@ -31,17 +31,17 @@ def create_credential(client: WebAuthn::FakeClient.new, rp_id: nil)
   response =
     WebAuthn::AuthenticatorAttestationResponse
     .new(
-      attestation_object: create_result["response"]["attestationObject"],
-      client_data_json: create_result["response"]["clientDataJSON"]
+      attestation_object: create_result['response']['attestationObject'],
+      client_data_json: create_result['response']['clientDataJSON']
     )
 
   credential_public_key = response.credential.public_key
 
-  [create_result["id"], credential_public_key, response.authenticator_data.sign_count]
+  [create_result['id'], credential_public_key, response.authenticator_data.sign_count]
 end
 
 def fake_origin
-  "http://localhost"
+  'http://localhost'
 end
 
 def fake_challenge
@@ -65,7 +65,8 @@ end
 
 # Borrowed from activesupport
 def silence_warnings
-  old_verbose, $VERBOSE = $VERBOSE, nil
+  old_verbose = $VERBOSE
+  $VERBOSE = nil
   yield
 ensure
   $VERBOSE = old_verbose
@@ -102,7 +103,7 @@ def create_rsa_key
 end
 
 def create_ec_key
-  OpenSSL::PKey::EC.new("prime256v1").generate_key
+  OpenSSL::PKey::EC.new('prime256v1').generate_key
 end
 
 X509_V3 = 2
@@ -122,11 +123,11 @@ def create_root_certificate(key, not_before: Time.now - 1, not_after: Time.now +
   extension_factory.issuer_certificate = certificate
 
   certificate.extensions = [
-    extension_factory.create_extension("basicConstraints", "CA:TRUE", true),
-    extension_factory.create_extension("keyUsage", "keyCertSign,cRLSign", true),
+    extension_factory.create_extension('basicConstraints', 'CA:TRUE', true),
+    extension_factory.create_extension('keyUsage', 'keyCertSign,cRLSign', true)
   ]
 
-  certificate.sign(key, "SHA256")
+  certificate.sign(key, 'SHA256')
 
   certificate
 end
@@ -150,11 +151,9 @@ def issue_certificate(
   certificate.not_after = not_after
   certificate.public_key = key
 
-  if extensions
-    certificate.extensions = extensions
-  end
+  certificate.extensions = extensions if extensions
 
-  certificate.sign(ca_key, "SHA256")
+  certificate.sign(ca_key, 'SHA256')
 
   certificate
 end

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "bindata"
-require "webauthn/authenticator_data/attested_credential_data"
-require "webauthn/error"
+require 'bindata'
+require 'webauthn/authenticator_data/attested_credential_data'
+require 'webauthn/error'
 
 module WebAuthn
   class AuthenticatorDataFormatError < WebAuthn::Error; end
@@ -67,9 +67,7 @@ module WebAuthn
     end
 
     def credential
-      if attested_credential_data_included?
-        attested_credential_data.credential
-      end
+      attested_credential_data.credential if attested_credential_data_included?
     end
 
     def attested_credential_data
@@ -86,9 +84,7 @@ module WebAuthn
     def aaguid
       raw_aaguid = attested_credential_data.raw_aaguid
 
-      unless raw_aaguid == WebAuthn::AuthenticatorData::AttestedCredentialData::ZEROED_AAGUID
-        attested_credential_data.aaguid
-      end
+      attested_credential_data.aaguid unless raw_aaguid == WebAuthn::AuthenticatorData::AttestedCredentialData::ZEROED_AAGUID
     end
 
     private
@@ -98,29 +94,23 @@ module WebAuthn
     end
 
     def raw_extension_data
-      if extension_data_included?
-        if attested_credential_data_included?
-          trailing_bytes[attested_credential_data.length..-1]
-        else
-          trailing_bytes.snapshot
-        end
+      return nil unless extension_data_included?
+
+      if attested_credential_data_included?
+        trailing_bytes[attested_credential_data.length..-1]
+      else
+        trailing_bytes.snapshot
       end
     end
 
     def attested_credential_data_length
-      if attested_credential_data_included?
-        attested_credential_data.length
-      else
-        0
-      end
+      return 0 unless attested_credential_data_included?
+      attested_credential_data.length
     end
 
     def extension_data_length
-      if extension_data_included?
-        raw_extension_data.length
-      else
-        0
-      end
+      return 0 unless extension_data_included?
+      raw_extension_data.length
     end
 
     def base_length

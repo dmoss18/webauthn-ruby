@@ -1,22 +1,22 @@
 # frozen_string_literal: true
 
-require "cose/algorithm"
-require "cose/error"
-require "cose/rsapkcs1_algorithm"
-require "openssl"
-require "webauthn/authenticator_data/attested_credential_data"
-require "webauthn/error"
+require 'cose/algorithm'
+require 'cose/error'
+require 'cose/rsapkcs1_algorithm'
+require 'openssl'
+require 'webauthn/authenticator_data/attested_credential_data'
+require 'webauthn/error'
 
 module WebAuthn
   module AttestationStatement
     class UnsupportedAlgorithm < Error; end
 
-    ATTESTATION_TYPE_NONE = "None"
-    ATTESTATION_TYPE_BASIC = "Basic"
-    ATTESTATION_TYPE_SELF = "Self"
-    ATTESTATION_TYPE_ATTCA = "AttCA"
-    ATTESTATION_TYPE_BASIC_OR_ATTCA = "Basic_or_AttCA"
-    ATTESTATION_TYPE_ANONCA = "AnonCA"
+    ATTESTATION_TYPE_NONE = 'None'
+    ATTESTATION_TYPE_BASIC = 'Basic'
+    ATTESTATION_TYPE_SELF = 'Self'
+    ATTESTATION_TYPE_ATTCA = 'AttCA'
+    ATTESTATION_TYPE_BASIC_OR_ATTCA = 'Basic_or_AttCA'
+    ATTESTATION_TYPE_ANONCA = 'AnonCA'
 
     ATTESTATION_TYPES_WITH_ROOT = [
       ATTESTATION_TYPE_BASIC,
@@ -26,7 +26,7 @@ module WebAuthn
     ].freeze
 
     class Base
-      AAGUID_EXTENSION_OID = "1.3.6.1.4.1.45724.1.1.4"
+      AAGUID_EXTENSION_OID = '1.3.6.1.4.1.45724.1.1.4'
 
       def initialize(statement)
         @statement = statement
@@ -45,7 +45,7 @@ module WebAuthn
       end
 
       def attestation_certificate_key_id
-        raw_subject_key_identifier&.unpack("H*")&.[](0)
+        raw_subject_key_identifier&.unpack('H*')&.[](0)
       end
 
       private
@@ -76,21 +76,19 @@ module WebAuthn
       end
 
       def algorithm
-        statement["alg"]
+        statement['alg']
       end
 
       def raw_certificates
-        statement["x5c"]
+        statement['x5c']
       end
 
       def signature
-        statement["sig"]
+        statement['sig']
       end
 
       def attestation_trust_path
-        if certificates&.any?
-          certificates
-        end
+        certificates if certificates&.any?
       end
 
       def trustworthy?(aaguid: nil, attestation_certificate_key_id: nil)
@@ -142,7 +140,7 @@ module WebAuthn
       end
 
       def raw_subject_key_identifier
-        extension = attestation_certificate.extensions.detect { |ext| ext.oid == "subjectKeyIdentifier" }
+        extension = attestation_certificate.extensions.detect { |ext| ext.oid == 'subjectKeyIdentifier' }
         return unless extension
 
         ext_asn1 = OpenSSL::ASN1.decode(extension.to_der)
@@ -151,7 +149,7 @@ module WebAuthn
       end
 
       def valid_signature?(authenticator_data, client_data_hash, public_key = attestation_certificate.public_key)
-        raise("Incompatible algorithm and key") unless cose_algorithm.compatible_key?(public_key)
+        raise('Incompatible algorithm and key') unless cose_algorithm.compatible_key?(public_key)
 
         cose_algorithm.verify(
           public_key,

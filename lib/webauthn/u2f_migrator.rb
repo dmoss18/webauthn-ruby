@@ -56,16 +56,16 @@ module WebAuthn
     # Sec-1 v2 uncompressed curve point representation [SEC1V2] to COSE_Key representation ([RFC8152] Section 7).
     def credential_cose_key
       decoded_public_key = Base64.strict_decode64(@public_key)
-      if WebAuthn::AttestationStatement::FidoU2f::PublicKey.uncompressed_point?(decoded_public_key)
-        COSE::Key::EC2.new(
-          alg: COSE::Algorithm.by_name("ES256").id,
-          crv: 1,
-          x: decoded_public_key[1..32],
-          y: decoded_public_key[33..-1]
-        )
-      else
-        raise "expected U2F public key to be in uncompressed point format"
+      unless WebAuthn::AttestationStatement::FidoU2f::PublicKey.uncompressed_point?(decoded_public_key)
+        raise 'expected U2F public key to be in uncompressed point format'
       end
+
+      COSE::Key::EC2.new(
+        alg: COSE::Algorithm.by_name('ES256').id,
+        crv: 1,
+        x: decoded_public_key[1..32],
+        y: decoded_public_key[33..-1]
+      )
     end
   end
 end
