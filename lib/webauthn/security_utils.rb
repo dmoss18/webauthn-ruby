@@ -4,6 +4,7 @@ require "securecompare"
 
 module WebAuthn
   module SecurityUtils
+    CHALLENGE_LENGTH = 32
     # Constant time string comparison, for variable length strings.
     # This code was adapted from Rails ActiveSupport::SecurityUtils
     #
@@ -15,6 +16,12 @@ module WebAuthn
 
       SecureCompare.compare(first_string_sha256, second_string_sha256) && first_string == second_string
     end
-    module_function :secure_compare
+
+    def generate_challenge
+      raw_challenge = SecureRandom.random_bytes(CHALLENGE_LENGTH)
+      WebAuthn.configuration.encoder.encode(raw_challenge)
+    end
+
+    module_function :secure_compare, :generate_challenge
   end
 end

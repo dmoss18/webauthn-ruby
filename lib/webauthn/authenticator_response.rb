@@ -33,7 +33,7 @@ module WebAuthn
       verify_item(:challenge, expected_challenge)
       verify_item(:origin, expected_origin)
       verify_item(:authenticator_data)
-      verify_item(:rp_id, rp_id || rp_id_from_origin(expected_origin))
+      verify_item(:rp_id, rp_id)
 
       if !WebAuthn.configuration.silent_authentication
         verify_item(:user_presence)

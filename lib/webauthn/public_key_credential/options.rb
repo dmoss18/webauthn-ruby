@@ -6,8 +6,6 @@ require "securerandom"
 module WebAuthn
   class PublicKeyCredential
     class Options
-      CHALLENGE_LENGTH = 32
-
       attr_reader :timeout, :extensions
 
       def initialize(timeout: default_timeout, extensions: nil)
@@ -53,7 +51,7 @@ module WebAuthn
       end
 
       def raw_challenge
-        @raw_challenge ||= SecureRandom.random_bytes(CHALLENGE_LENGTH)
+        @raw_challenge ||= SecureRandom.random_bytes(WebAuthn::SecurityUtils::CHALLENGE_LENGTH)
       end
 
       def default_timeout

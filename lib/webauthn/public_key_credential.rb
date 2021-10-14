@@ -6,13 +6,13 @@ module WebAuthn
   class PublicKeyCredential
     attr_reader :type, :id, :raw_id, :client_extension_outputs, :response
 
-    def self.from_client(credential)
+    def self.from_client(credential, response_class_override = nil)
       new(
         type: credential["type"],
         id: credential["id"],
         raw_id: WebAuthn.configuration.encoder.decode(credential["rawId"]),
         client_extension_outputs: credential["clientExtensionResults"],
-        response: response_class.from_client(credential["response"])
+        response: (response_class_override || response_class).from_client(credential["response"])
       )
     end
 

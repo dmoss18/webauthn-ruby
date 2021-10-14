@@ -33,8 +33,8 @@ module WebAuthn
         authenticator_data.attested_credential_data.valid?
     end
 
-    def valid_attestation_statement?(client_data_hash)
-      attestation_statement.valid?(authenticator_data, client_data_hash)
+    def valid_attestation_statement?(client_data_hash, options = {})
+      attestation_statement.valid?(authenticator_data, client_data_hash, options)
     end
 
     def_delegators :authenticator_data, :credential, :aaguid

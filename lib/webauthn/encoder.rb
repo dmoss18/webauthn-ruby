@@ -9,7 +9,7 @@ module WebAuthn
 
   class Encoder
     # https://www.w3.org/TR/webauthn-2/#base64url-encoding
-    STANDARD_ENCODING = :base64url
+    STANDARD_ENCODING = :base64
 
     attr_reader :encoding
 

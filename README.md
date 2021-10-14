@@ -420,12 +420,32 @@ credential.authenticator_extension_outputs
 | android-key | Yes |
 | android-safetynet | Yes |
 | apple | Yes |
+| apple-appattest | Yes |
 | fido-u2f | Yes |
 | none | Yes |
 
 ### Attestation Types
 
 You can define what trust policy to enforce by setting `acceptable_attestation_types` config to a subset of `['None', 'Self', 'Basic', 'AttCA', 'Basic_or_AttCA']` and `attestation_root_certificates_finders` to an object that responds to `#find` and returns the corresponding root certificate for each registration. The `#find` method will be called passing keyword arguments `attestation_format`, `aaguid` and `attestation_certificate_key_id`.
+
+### Apple App Attest
+
+Attestations using iOS are handled slightly differently. Apple lists all of the server-side steps required to verify the attestation object (here)[https://developer.apple.com/documentation/devicecheck/validating_apps_that_connect_to_your_server]. See `WebAuthn::AttestationStatement::AppleAppAttest.valid?` for implementation.
+
+Example usage:
+```ruby
+credential = WebAuthn::Credential.from_ios_attest(
+  attestation_string: attestation_str, # Base64 encoded attestation data from iOS device
+  key_id: key_id, # attestation key identifier from iOS
+  app_id: app_id, # iOS app id in format "<apple_team_id>.<bundle_identifier>"
+  challenge: challenge # challenge provided by client
+)
+
+# Pass in the challenge you stored on your server
+credential.verify(expected_challenge)
+```
+
+Attestation passes if no errors are raised.
 
 ## Testing Your Integration
 
